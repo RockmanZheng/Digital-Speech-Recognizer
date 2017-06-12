@@ -1,0 +1,13 @@
+00 !SILENCE [] zz zz zz
+01 !SHORTPAUSE [] sp sp sp
+02 ZERO ZERO z iy r ow
+03 OH OH e o w
+04 ONE ONE w ah n
+05 TWO TWO t uw
+06 THREE THREE th r iy
+07 FOUR FOUR f ao r
+08 FIVE FIVE f ay v
+09 SIX SIX s ih k s
+10 SEVEN SEVEN s eh v ax n
+11 EIGHT EIGHT ey t
+12 NINE NINE n ay n
