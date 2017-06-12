@@ -69,7 +69,7 @@ class Signal:
         for i in range(num_bands):
             start = i*freq_step
             band = noise_spectrum[start:start+band_width]*triang_bank
-            energy = sum(map(lambda x:np.power(np.abs(x),2),band))
+            energy = np.log(1e-25+sum(map(lambda x:np.power(np.abs(x),2),band)))
             thresholds.append(energy)
 
         # Pad the original signal to its end
@@ -92,7 +92,7 @@ class Signal:
             frames.append(frame)
 
         # Spectral analysis
-        sharpness = 0.01
+        sharpness = 0.1
         new_frames = []
         for frame in frames:
             spectrum = fft(frame)[0:freq_supp_size]
@@ -103,7 +103,7 @@ class Signal:
             for i in range(num_bands):
                 start = i*freq_step
                 band = spectrum[start:start+band_width]*triang_bank
-                energy = sum(map(lambda x:np.power(np.abs(x),2),band))
+                energy = np.log(1e-25+sum(map(lambda x:np.power(np.abs(x),2),band)))
                 diff = energy-thresholds[i]
                 gain = 1.0/(1+np.exp(-sharpness*diff))
                 band *= gain    # Attenuate
@@ -156,7 +156,7 @@ class Signal:
         # Truncate silence
         new_frames = []
         for frame in frames:
-            energy = sum(map(lambda x:np.power(np.abs(x),2),frame))
+            energy = np.log(1e-25+sum(map(lambda x:np.power(np.abs(x),2),frame)))
             if energy>threshold:
                 new_frames.append(frame)
         
