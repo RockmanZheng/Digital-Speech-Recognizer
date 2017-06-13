@@ -5,14 +5,17 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{e1486083-f076-4126-8a80-94718aaab2ff}</ProjectGuid>
     <ProjectHome />
-    <StartupFile />
+    <StartupFile>src\ModelInitializer.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <InterpreterId>Global|PythonCore|3.5</InterpreterId>
-    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
+    <EnableNativeCodeDebugging>True</EnableNativeCodeDebugging>
+    <InterpreterArguments>-i</InterpreterArguments>
+    <IsWindowsApplication>False</IsWindowsApplication>
+    <CommandLineArguments>dictionary project</CommandLineArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
@@ -1111,6 +1114,13 @@
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|PythonCore|3.5" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="src\core\TrainCore\TrainCore\TrainCore.vcxproj">
+      <Name>TrainCore</Name>
+      <Project>{210606ac-abea-49c0-93fa-fb1ddd13ed9a}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>

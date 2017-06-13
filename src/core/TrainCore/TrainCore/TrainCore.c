@@ -369,7 +369,7 @@ void BWTrainCore(CSRMatrix *log_trans,
 		printf("BWTrain: Log likelihood of observations: %f\n", log_p_y);
 		// Check convergence
 
-		if (fabs(exp(-fabs(old_log_p_y - log_p_y)) - 1.0) < error)
+		if (fabs(old_log_p_y / log_p_y - 1.0) < error)
 		{
 			break;
 		}
@@ -842,7 +842,7 @@ void VTrainCore(CSRMatrix *log_trans,
 	int mode                         // Specify initialize mode, if this is a new model, use flat start
 )
 {
-	double error = 1e-5;
+	double error = 5e-4;
 	double old_log_p = 0.0;
 	double log_p, den;
 	int N, M, D, R, T_sum;
@@ -941,20 +941,9 @@ void VTrainCore(CSRMatrix *log_trans,
 			log_p += VDecode(state_align[r], log_trans, log_coef, mean, log_var, observations->data[r]);
 		}
 		// Iterate until convergence
-		// delta = log(fabs(exp(old_log_p - log_p) - 1.0)) + log_p;
-		delta = fabs(exp(-fabs(old_log_p - log_p)) - 1.0);
-		
+		delta = fabs(old_log_p / log_p - 1.0);
+
 		printf("VTrain: delta = %f\n", delta);
-		//printf("VTrain: alignment:\n");
-		//for (r = 0; r < R; r++)
-		//{
-		//	printf("Utterance %d:\n", r);
-		//	for (t = 0; t < T[r]; t++)
-		//	{
-		//		printf("%d ", state_align[r][t]);
-		//	}
-		//	printf("\n");
-		//}
 		// Update
 		old_log_p = log_p;
 	} while (delta > error);

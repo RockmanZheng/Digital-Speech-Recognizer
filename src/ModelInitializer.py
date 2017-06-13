@@ -6,13 +6,13 @@ import math
 import numpy as np
 from Utility import ParseConfig, GetDictionary
 from pdb import set_trace
-from TrainCore import VTrain
-import os
+from x64.Release.TrainCore import VTrain
+from os import getcwd
 from MFCC import load
 from glob import glob
 
 
-MAIN_DIR = '../'
+MAIN_DIR = getcwd() + '/'
 MFCC_FOLDER = MAIN_DIR + 'mfcc/single/'
 MODEL_FOLDER = MAIN_DIR + 'model/'
 PREMODEL_FOLDER = MAIN_DIR + 'premodel/'
