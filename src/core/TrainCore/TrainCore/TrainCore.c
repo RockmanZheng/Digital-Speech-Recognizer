@@ -842,7 +842,6 @@ void VTrainCore(CSRMatrix *log_trans,
 	int mode                         // Specify initialize mode, if this is a new model, use flat start
 )
 {
-	// double error = -16;
 	double error = 1e-5;
 	double old_log_p = 0.0;
 	double log_p, den;
@@ -944,7 +943,18 @@ void VTrainCore(CSRMatrix *log_trans,
 		// Iterate until convergence
 		// delta = log(fabs(exp(old_log_p - log_p) - 1.0)) + log_p;
 		delta = fabs(exp(-fabs(old_log_p - log_p)) - 1.0);
-
+		
+		printf("VTrain: delta = %f\n", delta);
+		//printf("VTrain: alignment:\n");
+		//for (r = 0; r < R; r++)
+		//{
+		//	printf("Utterance %d:\n", r);
+		//	for (t = 0; t < T[r]; t++)
+		//	{
+		//		printf("%d ", state_align[r][t]);
+		//	}
+		//	printf("\n");
+		//}
 		// Update
 		old_log_p = log_p;
 	} while (delta > error);
@@ -959,50 +969,6 @@ void VTrainCore(CSRMatrix *log_trans,
 }
 
 /************************** End Core Codes **********************************/
-
-/* // Viterbi training */
-/* static PyObject* */
-/* VTrainAPI(PyObject *self, PyObject *args) */
-/* { */
-/*   PyObject *Pylog_trans,*Pylog_coef,*Pymean,*Pylog_var,*Pyobservations; */
-/*   if(!PyArg_ParseTuple(args,"OOOOO",&Pylog_trans,&Pylog_coef,&Pymean,&Pylog_var,&Pyobservations)) */
-/*     return NULL; */
-
-/*   // Type conversion from Python to C */
-/*   COOMatrix *log_trans_coo; */
-/*   CSRMatrix *log_trans; */
-/*   Matrix *log_coef; */
-/*   Array *mean,*log_var; */
-/*   Observation *observations; */
-
-/*   log_coef = PyList2Matrix(Pylog_coef); */
-/*   observations = PyList2Observation(Pyobservations); */
-/*   mean = PyList2Array(Pymean); */
-/*   log_var = PyList2Array(Pylog_var); */
-/*   log_trans_coo = PyList2COOMat(Pylog_trans,log_coef->row,log_coef->row); */
-/*   log_trans = COO2CSR(log_trans_coo); */
-/*   FreeCOOMat(log_trans_coo); */
-/*   // Call train function */
-/*   VTrainCore(log_trans,log_coef,mean,log_var,observations); */
-
-/*   // Type conversion from C to Python */
-/*   log_trans_coo = CSR2COO(log_trans); */
-/*   Pylog_trans = COOMat2PyList(log_trans_coo); */
-/*   Pylog_coef = Matrix2PyList(log_coef); */
-/*   Pymean = Array2PyList(mean); */
-/*   Pylog_var = Array2PyList(log_var); */
-
-/*   // Clean up */
-/*   FreeCOOMat(log_trans_coo); */
-/*   FreeCSRMat(log_trans); */
-/*   FreeMat(log_coef); */
-/*   FreeMat(observations); */
-/*   FreeArray(mean); */
-/*   FreeArray(log_var); */
-
-/*   // Return */
-/*   return Py_BuildValue("OOOO",Pylog_trans,Pylog_coef,Pymean,Pylog_var); */
-/* } */
 
 PyDoc_STRVAR(TrainCore_VTrain_doc, "Use Viterbi algorithm to roughly estimate parameters for HMM.\
 VTrain(num_state, num_component, network, observations)");
@@ -1149,3 +1115,7 @@ static PyModuleDef TrainCore_def = {
 PyMODINIT_FUNC PyInit_TrainCore() {
 	return PyModuleDef_Init(&TrainCore_def);
 }
+//
+//PyMODINIT_FUNC PyInit_TrainCore_d() {
+//	return PyModuleDef_Init(&TrainCore_def);
+//}

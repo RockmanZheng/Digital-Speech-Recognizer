@@ -1,5 +1,3 @@
-00 !SILENCE [] zz zz zz
-01 !SHORTPAUSE [] sp sp sp
 02 ZERO ZERO z iy r ow
 03 OH OH e o w
 04 ONE ONE w ah n
