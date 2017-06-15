@@ -12,7 +12,7 @@ typedef struct {
 }Array;
 
 Array*
-PyList2Array(const PyObject* list);
+PyList2Array(PyObject* list);
 
 PyObject*
 Array2PyList(const Array* a);
@@ -33,7 +33,7 @@ typedef struct {
 }Matrix;
 
 Matrix*
-PyList2Matrix(const PyObject* list);
+PyList2Matrix(PyObject* list);
 
 
 PyObject*
@@ -73,7 +73,7 @@ void
 FreeCOOMat(COOMatrix *a);
 
 COOMatrix*
-PyList2COOMat(const PyObject *list, int row, int col);
+PyList2COOMat(PyObject *list, int row, int col);
 
 
 PyObject*
@@ -148,7 +148,7 @@ void
 FreeObservation(Observation* obs);
 
 Observation*
-PyList2Observation(const PyObject *list);
+PyList2Observation(PyObject *list);
 
 typedef struct {
 	int *row_idx;
@@ -162,7 +162,7 @@ Network*
 NewNetwork(int nnz, int row, int col);
 
 Network*
-PyList2Network(const PyObject *list, int row, int col);
+PyList2Network(PyObject *list, int row, int col);
 
 void
 FreeNetwork(Network *net);
@@ -183,7 +183,7 @@ NewModel(int num_states, int num_components, int dim, int nnz);
 void
 FreeModel(Model * model);
 
-Model* PyList2Model(const PyObject*list);
+Model* PyList2Model(PyObject*list);
 
 #endif
 

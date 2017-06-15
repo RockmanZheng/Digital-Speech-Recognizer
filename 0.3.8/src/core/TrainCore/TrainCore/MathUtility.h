@@ -25,7 +25,7 @@ double
 LogSum(double a, double b);
 
 double
-LogGaussian(const double* x, const double *mean, const double *log_var, int dim);
+LogGaussian(const double* x, const double *mean, const double *var, int dim);
 
 void
 LogEmitProb(Array *log_b, const Array *mean, const Array *log_var, const Matrix *observations);

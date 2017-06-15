@@ -4,8 +4,11 @@
 #include "TrainCore.h"
 #include "MathUtility.h"
 #include "ViterbiDecode.h"
+#include "TypeConvertor.h"
 #include <string.h>
 #include <time.h>
+
+//#include <armadillo>
 
 /*************************** Begin Core Codes ******************************/
 #define _USE_MATH_DEFINES
@@ -654,7 +657,7 @@ VDecode(int *state_align,
 }
 
 // Estimate parameters according to states alignment
-void VEstimate(const int **state_align,
+void VEstimate(int **state_align,
 	const Observation *observations,
 	Matrix *log_coef,
 	Array *mean,
@@ -960,7 +963,7 @@ void VTrainCore(CSRMatrix *log_trans,
 }
 
 
-int VDecodeCore(const Model** models, int num_models, const Matrix* observations) {
+int VDecodeCore(Model** models, int num_models, const Matrix* observations) {
 	double* log_ps = (double*)calloc(num_models, sizeof(double));
 	int i;
 	int *state_align = (int*)calloc(observations->row, sizeof(int));
@@ -977,6 +980,50 @@ int VDecodeCore(const Model** models, int num_models, const Matrix* observations
 		}
 	}
 	free(state_align);
+	free(log_ps);
+	return ans;
+}
+
+int BWDecodeCore(Model **models, int num_models, const Matrix *observations) {
+	double* log_pys = (double*)calloc(num_models, sizeof(double));
+	int i;
+	int N, M, T, L;
+	T = observations->row;
+	L = observations->col;
+	// Allocate memory
+	Array *log_b;
+	Matrix *log_mix_b;
+	Matrix *log_alpha;
+	for (i = 0; i < num_models; i++) {
+		N = models[i]->log_trans->row;
+		M = models[i]->log_coef->col;
+
+		log_b = NewArray(N, M, T);
+		log_mix_b = NewMat(N, T);
+		log_alpha = NewMat(N, T);
+		// Compute log_b
+		LogEmitProb(log_b, models[i]->mean, models[i]->log_var, observations);
+		// Compute log_mix_b
+		LogMixEmitProb(log_mix_b, log_b, models[i]->log_coef);
+		// Forward procedure
+		Forward(log_alpha, models[i]->log_trans, log_mix_b);
+
+		// Compute log p(y)
+		log_pys[i] = LogPY(log_alpha);
+		//printf("BWDecode: model = %i, log_p = %f\n", i, log_pys[i]);
+		FreeArray(log_b);
+		FreeMat(log_mix_b);
+		FreeMat(log_alpha);
+	}
+	double max_log_p = log_pys[0];
+	int ans = 0;
+	for (i = 1; i < num_models; i++) {
+		if (log_pys[i] > max_log_p) {
+			max_log_p = log_pys[i];
+			ans = i;
+		}
+	}
+	free(log_pys);
 	return ans;
 }
 
@@ -1116,12 +1163,46 @@ VDecodeAPI(PyObject *self, PyObject *args)
 	return Py_BuildValue("O", PyAns);
 }
 
+PyDoc_STRVAR(TrainCore_BWDecode_doc, "Use forward algorithm to decode. \
+BWDecode(models,observations)");
+
+// soft decoding
+static PyObject *
+BWDecodeAPI(PyObject *self, PyObject *args)
+{
+	PyObject *PyModels, *PyObservations, *PyAns;
+	if (!PyArg_ParseTuple(args, "OO", &PyModels, &PyObservations))
+		return NULL;
+
+	int num_models = PyList_Size(PyModels);
+	Model** models = (Model**)calloc(num_models, sizeof(Model*));
+	int i;
+	for (i = 0; i < num_models; i++) {
+		PyObject *PyModel = PyList_GetItem(PyModels, i);
+		models[i] = PyList2Model(PyModel);
+	}
+	Matrix* observations = PyList2Matrix(PyObservations);
+
+	int ans = BWDecodeCore(models, num_models, observations);
+	PyAns = PyLong_FromLong(ans);
+
+	// Clean up
+	for (i = 0; i < num_models; i++) {
+		FreeModel(models[i]);
+	}
+	free(models);
+	FreeMat(observations);
+	// Return
+	return Py_BuildValue("O", PyAns);
+}
+
 
 
 static PyMethodDef TrainCore_functions[] = {
 	{"BWTrain", (PyCFunction)BWTrainAPI, METH_VARARGS, TrainCore_BWTrain_doc},
 	{"VTrain", (PyCFunction)VTrainAPI, METH_VARARGS, TrainCore_VTrain_doc },
 	{ "VDecode", (PyCFunction)VDecodeAPI, METH_VARARGS, TrainCore_VDecode_doc },
+	{ "BWDecode", (PyCFunction)BWDecodeAPI, METH_VARARGS, TrainCore_BWDecode_doc },
 	{NULL, NULL, 0, NULL} };
 
 /*
@@ -1159,7 +1240,6 @@ static PyModuleDef TrainCore_def = {
 	NULL,           /* m_clear */
 	NULL,           /* m_free */
 };
-
 PyMODINIT_FUNC PyInit_TrainCore() {
 	return PyModuleDef_Init(&TrainCore_def);
 }

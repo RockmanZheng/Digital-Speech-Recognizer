@@ -2,7 +2,7 @@
 #include "TypeConvertor.h"
 #include <math.h>
 
-double LOG_LOW_BOUND = -700;
+double LOG_LOW_BOUND = -1e20;
 double LOG_ARG_BOUND = 1e-300;
 double EXP_LOW_BOUND = 1e-300;
 double EXP_ARG_BOUND = -700.0;
@@ -41,9 +41,10 @@ LogSum(double a, double b)
 static double LOG_2_PI = 1.8378770664093453;
 
 double
-LogGaussian(const double *x, const double *mean, const double *log_var, int dim)
+LogGaussian(const double *x, const double *mean, const double *log_var,int dim)
 {
-	double sharpness = 1e5;
+	//int dim = covar->row;
+	//double sharpness = 1e5;
 	//double log_prob = -LOG_2_PI * dim;
 	double log_prob = 0.0;
 
@@ -52,7 +53,7 @@ LogGaussian(const double *x, const double *mean, const double *log_var, int dim)
 	for (k = 0; k < dim; k++)
 	{
 		diff = x[k] - mean[k];
-		log_prob -= diff * diff / SafeExp(log_var[k]) / sharpness;
+		log_prob -= diff * diff / SafeExp(log_var[k]);
 	}
 	return ToSafeLog(0.5 * log_prob);
 }

@@ -4,7 +4,7 @@
 #include <string.h>
 
 Array *
-PyList2Array(const PyObject *list)
+PyList2Array(PyObject *list)
 {
 	int i, j, k;
 	Array *a = (Array *)calloc(1, sizeof(Array));
@@ -84,7 +84,7 @@ NewArray(int row, int col, int lay)
 }
 
 Matrix *
-PyList2Matrix(const PyObject *list)
+PyList2Matrix(PyObject *list)
 {
 	int i, j;
 	Matrix *a = (Matrix *)calloc(1, sizeof(Matrix));
@@ -170,7 +170,7 @@ void FreeCOOMat(COOMatrix *a)
 }
 
 COOMatrix *
-PyList2COOMat(const PyObject *list, int row, int col)
+PyList2COOMat(PyObject *list, int row, int col)
 {
 	PyObject *row_idx = PyList_GetItem(list, 0);
 	PyObject *col_idx = PyList_GetItem(list, 1);
@@ -397,7 +397,7 @@ void FreeObservation(Observation *obs)
 }
 
 Observation *
-PyList2Observation(const PyObject *list)
+PyList2Observation(PyObject *list)
 {
 	int R, D, T;
 	//  int *T = (int*)calloc(R,sizeof(int));
@@ -444,7 +444,7 @@ NewNetwork(int nnz, int row, int col)
 }
 
 Network *
-PyList2Network(const PyObject *list, int row, int col)
+PyList2Network(PyObject *list, int row, int col)
 {
 	PyObject *row_idx, *col_idx;
 	row_idx = PyList_GetItem(list, 0);
@@ -496,7 +496,7 @@ FreeModel(Model * model) {
 	free(model);
 }
 
-Model* PyList2Model(const PyObject* list) {
+Model* PyList2Model(PyObject* list) {
 	PyObject *PyLogTrans, *PyLogCoef, *PyMean, *PyLogVar;
 	PyLogTrans = PyList_GetItem(list, 0);
 	PyLogCoef = PyList_GetItem(list, 1);

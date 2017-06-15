@@ -1,13 +1,14 @@
 # Initialize single word model
 # By using Viterbi estimate formulae
 import sys
+from os import getcwd
+sys.path.append(getcwd())
 from ModelIO import ReadPreModel, WriteModel
 import math
 import numpy as np
 from Utility import ParseConfig, GetDictionary
 from pdb import set_trace
 from x64.Release.TrainCore import VTrain
-from os import getcwd
 from MFCC import load
 from glob import glob
 

@@ -6,7 +6,7 @@ from ModelIO import WriteModel,ReadModel
 from Utility import ParseConfig, GetDictionary
 from MFCC import load
 import numpy as np
-from x64.Release.TrainCore import VDecode
+from x64.Release.TrainCore import VDecode,BWDecode
 from glob import glob
 from pdb import set_trace
 from os import getcwd
@@ -53,12 +53,18 @@ for k in range(len(model_id)):
 
     dim_observation = len(feat_list[0][0])
 
-    print('VDecode: ' + str(k + 1) + '/' + str(len(model_id)))
+    #print('VDecode: ' + str(k + 1) + '/' + str(len(model_id)))
+    print('BWDecode: ' + str(k + 1) + '/' + str(len(model_id)))
+
 
     for i in range(len(feat_list)):
         #print('VDecode: Using ' + str(i + 1) + '/' + str(len(feat_list)) + ' recording')
-        ans = VDecode(models,feat_list[i])
-        print('VDecode: predict = '+str(ans)+', real = '+str(k))
+        #ans = VDecode(models,feat_list[i])
+        #print('VDecode: predict = '+str(ans)+', real = '+str(k))
+
+        ans = BWDecode(models,feat_list[i])
+        print('BWDecode: predict = '+str(ans)+', real = '+str(k))
+
         # Wrong prediction
         if ans != k:
             count+=1
