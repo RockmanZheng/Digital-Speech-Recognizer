@@ -1,25 +1,26 @@
-from MFCC import mfcc
+from MFCC import mfcc,cook
 from os.path import join,split
 from glob import glob
 from SignalProcessor import Signal
+from os import getcwd
 
-MAIN_DIR = '../'
+MAIN_DIR = getcwd()+'/'
 WAVE_FOLDER = MAIN_DIR + 'wav/'
-COOKED_FOLDER = WAVE_FOLDER + 'single-cooked/'
-MFCC_DIR = MAIN_DIR + 'mfcc/single/'
+# COOKED_FOLDER = WAVE_FOLDER + 'single-cooked/'
+MFCC_DIR = MAIN_DIR + 'mfcc/train/'
 
+TRAIN_DIR = WAVE_FOLDER+'train/'
 
-def cook():
-    for wavfilename in glob(join(COOKED_FOLDER,'*.wav')):
-        print('Cooking ' + split(wavfilename)[1])
-        signal = Signal(wavfilename)
-        feat = mfcc(signal.data,signal.rate)
-        outname = MFCC_DIR + split(wavfilename)[1].replace('wav','txt')
-        out = open(outname,'w')
-        # out.write(str(len(feat))+' '+str(len(feat[0]))+'\n')
-        for i in range(len(feat)):
-            out.write(str(list(feat[i])).strip('[]').replace(' ','') + '\n')
-        out.close()
-        print('Done')
+if len(argv) != 2:
+    sys.argv('Usage: mfccCooker.py <train-dir>')
 
-cook()
+COLLECT_DIR = TRAIN_DIR+argv[1]+'/'
+COOKED_DIR = TRAIN_DIR+argv[1]+'-cooked/'
+OUTPUT_DIR = MFCC_DIR+argv[1]+'/'
+
+def _cook():
+    for wavfilename in glob(join(COOKED_DIR,'*.wav')):
+        cook(wavfilename,OUTPUT_DIR)
+    print('Done\a')
+
+_cook()

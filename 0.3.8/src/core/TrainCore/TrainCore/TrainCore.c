@@ -1243,7 +1243,3 @@ static PyModuleDef TrainCore_def = {
 PyMODINIT_FUNC PyInit_TrainCore() {
 	return PyModuleDef_Init(&TrainCore_def);
 }
-//
-//PyMODINIT_FUNC PyInit_TrainCore_d() {
-//	return PyModuleDef_Init(&TrainCore_def);
-//}

@@ -210,3 +210,13 @@ def Array3DNodeWriter(node, array3d):
             for entry in col:
                 node.text += str(entry) + ' '
     return
+
+def LoadModels(model_id,MODEL_FOLDER):
+	models = []
+	for k in range(len(model_id)):
+		# Load model
+		model_filename = MODEL_FOLDER + model_id[k] + '.xml'
+		name,states,num_states,num_components,dim_observation,log_trans,log_coef,mean,log_var = ReadModel(model_filename)
+		model = [log_trans,log_coef,mean,log_var]
+		models.append(model)
+	return models

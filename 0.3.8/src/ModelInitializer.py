@@ -11,10 +11,9 @@ from pdb import set_trace
 from x64.Release.TrainCore import VTrain
 from MFCC import load
 from glob import glob
-
+from sys import argv
 
 MAIN_DIR = getcwd() + '/'
-MFCC_FOLDER = MAIN_DIR + 'mfcc/single/'
 MODEL_FOLDER = MAIN_DIR + 'model/'
 PREMODEL_FOLDER = MAIN_DIR + 'premodel/'
 DICT_DIR = MAIN_DIR + 'dict/'
@@ -23,15 +22,18 @@ CONFIG_DIR = MAIN_DIR + 'config/'
 #########################################################################
 #                          MAIN ENTRY #
 #########################################################################
-if len(sys.argv) < 3:
-    sys.exit("Usage: ModelIitializer.py <dict> <config>")
+if len(argv) != 4:
+    exit("Usage: ModelIitializer.py <dict> <config> <mfcc-dir>")
 
-words, model_id = GetDictionary(DICT_DIR + sys.argv[1] + '.txt')
+
+MFCC_FOLDER = MAIN_DIR + 'mfcc/train/'+argv[3]+'/'
+
+words, model_id = GetDictionary(DICT_DIR + argv[1] + '.txt')
 
 num_components_key = 'NUMCOMPONENTS'
 num_repeat_key = 'NUMREPEAT'
 # Get configuration
-conf_filename = CONFIG_DIR + sys.argv[2] + '.conf'
+conf_filename = CONFIG_DIR + argv[2] + '.conf'
 num_components = ParseConfig(conf_filename, num_components_key)
 num_repeat = ParseConfig(conf_filename, num_repeat_key)
 if num_components != '':
@@ -49,10 +51,6 @@ for k in range(len(model_id)):
     # Load MFCC data
     # To compute the global mean and log_var
     MFCC_filename_list = glob(MFCC_FOLDER + '*' + model_id[k] + '*.txt')
-    # MFCC_filename_list = [MFCC_FOLDER+model_id[k]+'-'+str(num)+'.xml' for num
-    # in range(num_repeat)]
-    # feat_list,dim_observation_list,num_frames_list =
-    # MFCCIO.ReadMFCCs(MFCC_filename_list)
     feat_list = []
     for filename in MFCC_filename_list:
         feat_list.append(load(filename))
@@ -67,8 +65,6 @@ for k in range(len(model_id)):
     print('Viterbi Training: ' + str(k + 1) + '/' + str(len(model_id)))
 
     log_trans, log_coef, mean, log_var = VTrain(num_states, num_components, network, feat_list)
-    
-    
     # Write in model file
     WriteModel(name, states, num_states, num_components, dim_observation,
                log_trans, log_coef, mean, log_var, MODEL_FOLDER + model_id[k] + '.xml')

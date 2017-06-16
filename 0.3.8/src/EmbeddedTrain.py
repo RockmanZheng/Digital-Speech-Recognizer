@@ -13,7 +13,6 @@ from os import getcwd
 
 
 MAIN_DIR = getcwd() + '/'
-MFCC_FOLDER = MAIN_DIR + 'mfcc/single/'
 MODEL_FOLDER = MAIN_DIR + 'model/'
 DICT_DIR = MAIN_DIR + 'dict/'
 CONFIG_DIR = MAIN_DIR + 'config/'
@@ -27,9 +26,10 @@ max_iter = int(ParseConfig(conf_filename,'MAXITER'))
 #########################################################################
 #                          MAIN ENTRY #
 #########################################################################
-if len(sys.argv) < 3:
-    sys.exit("Usage: EmbeddedTrain.py <dict> <config>")
+if len(sys.argv) != 4:
+    sys.exit("Usage: EmbeddedTrain.py <dict> <config> <mfcc-dir>")
 
+MFCC_FOLDER = MAIN_DIR + 'mfcc/train/'+sys.argv[3]+'/'
 words, model_id = GetDictionary(DICT_DIR + sys.argv[1] + '.txt')
 
 # For each model

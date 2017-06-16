@@ -1,9 +1,10 @@
 # CreateModel.py
 # Create file which only specifies the network of single models
-import sys
 import math
 from ModelIO import WritePreModel
-
+from os import getcwd
+from Utility import ParseConfig
+from sys import argv
 
 def get_row_idx(num_states):
     row_idx = [0]
@@ -21,19 +22,18 @@ def get_col_idx(num_states):
     return col_idx
 
 
-MAIN_DIR = '../'
-MFCC_FOLDER = MAIN_DIR + 'mfcc/single/'
-MODEL_FOLDER = MAIN_DIR + 'model/'
+MAIN_DIR = getcwd()+'/'
 PREMODEL_FOLDER = MAIN_DIR + 'premodel/'
 DICT_DIR = MAIN_DIR + 'dict/'
+CONFIG_DIR = MAIN_DIR + 'config/'
 
 #########################################################################
 #                          MAIN ENTRY #
 #########################################################################
-if len(sys.argv) < 2:
-    sys.exit("Usage: ModelCreator.py <dict>")
+if len(argv) != 3:
+    exit("Usage: ModelCreator.py <dict> <config>")
 
-dict_file = open(DICT_DIR + sys.argv[1] + '.txt')
+dict_file = open(DICT_DIR + argv[1] + '.txt')
 tokens_list = []
 
 for line in dict_file:
@@ -41,14 +41,19 @@ for line in dict_file:
 
 dict_file.close()
 
+
+num_subphones_key = 'NUMSUBPHONES'	
+# Get configuration
+num_subphones = int(ParseConfig(CONFIG_DIR + argv[2] + '.conf',num_subphones_key))
+
+
 for tokens in tokens_list:
     ID = tokens[0]
     name = tokens[1]
     states = ['<START>']
     for i in range(3, len(tokens)):
-        states.append('<' + tokens[i] + '->')
-        states.append('<' + tokens[i] + '~>')
-        states.append('<' + tokens[i] + '+>')
+        for k in range(num_subphones):
+            states.append('<' + tokens[i] + str(k)+'>')
 
     states.append('<END>')
     num_states = len(states)

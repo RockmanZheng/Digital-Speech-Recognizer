@@ -3,6 +3,9 @@ from scipy.fftpack import fft,ifft,dct
 from scipy.signal import get_window
 import numpy as np
 from pdb import set_trace
+from os.path import join,split
+from glob import glob
+from SignalProcessor import Signal
 
 # linear scale to mel scale
 def mel_scale(f):
@@ -20,9 +23,9 @@ def pre_emph(x):
 def _frame(x,width=512):
     frames = []
     hann_win = get_window('hann',width)
-    step = width / 2
+    step = width // 2
     pad_size = step - len(x) % step + 1
-    num_frames = (len(x) - width + pad_size) / step + 1
+    num_frames = (len(x) - width + pad_size) // step + 1
     zeros = np.zeros(pad_size)
     data = np.hstack((x,zeros))
 
@@ -48,7 +51,7 @@ def triang_win(width,center=0.5):
 
 def frame_mfcc(frame,rate):
     width = len(frame)
-    spectrum = fft(frame)[0:width / 2 + 1]
+    spectrum = fft(frame)[0:width // 2 + 1]
     linear_upperbound = 44100.0 / 2
     linear_lowerbound = 0.0
     mel_upperbound = mel_scale(linear_upperbound)
@@ -56,9 +59,9 @@ def frame_mfcc(frame,rate):
     # Number of MFCC entries
     N = 13
     mel_step = (mel_upperbound - mel_lowerbound) / N
-    mel_center = map(lambda i:(i + 0.5) * mel_step,range(N))
+    mel_center = list(map(lambda i:(i + 0.5) * mel_step,range(N)))
     
-    linear_center = [linear_lowerbound] + map(linear_scale,mel_center) + [linear_upperbound]
+    linear_center = [linear_lowerbound] + list(map(linear_scale,mel_center)) + [linear_upperbound]
     banks = []
     # frequency step of the FFT output
     freq_unit = float(rate) / (width + 2)
@@ -71,17 +74,17 @@ def frame_mfcc(frame,rate):
     energy = []
     for i in range(N):
         start = int(linear_center[i] / freq_unit)
-        energy.append(np.log(1e-25 + sum(map(lambda x:np.power(np.abs(x),2),spectrum[start:start + len(banks[i])] * banks[i]))))
-        # energy.append(sum(map(lambda
+        energy.append(np.log(1e-25 + sum(list(map(lambda x:np.power(np.abs(x),2),spectrum[start:start + len(banks[i])] * banks[i])))))
+        # energy.append(sum(list(map(lambda)
         # x:np.power(np.abs(x),2),spectrum[start:start+len(banks[i])]*banks[i])))
         
     energy = np.array(energy)
     # obtain mfcc
     mfcc = dct(energy)
     # replace first cepstral coefficient with log of frame energy
-    # frame_energy = np.log(1e-25+sum(map(lambda
+    # frame_energy = np.log(1e-25+sum(list(map(lambda)
     # x:np.power(np.abs(x),2),frame)))
-    # frame_energy = sum(map(lambda x:np.power(np.abs(x),2),frame))
+    # frame_energy = sum(list(map(lambda x:np.power(np.abs(x),2),frame)))
     # set_trace()
     # mfcc[0] = frame_energy
     return mfcc
@@ -120,3 +123,13 @@ def load(filename):
     for line in f:
         mfccs.append(list(map(float,line.strip().split(','))))
     return mfccs
+
+def cook(wavfilename,output_dir):
+    print('Cooking ' + split(wavfilename)[1])
+    signal = Signal(wavfilename)
+    feat = mfcc(signal.data,signal.rate)
+    outname = output_dir + split(wavfilename)[1].replace('wav','txt')
+    out = open(outname,'w')
+    for i in range(len(feat)):
+        out.write(str(list(feat[i])).strip('[]').replace(' ','') + '\n')
+    out.close()

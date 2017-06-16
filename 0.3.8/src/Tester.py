@@ -2,43 +2,35 @@
 # Run over all transcriptions to train all word models
 # Including background noise model
 import sys
-from ModelIO import WriteModel,ReadModel
+from ModelIO import WriteModel,ReadModel,LoadModels
 from Utility import ParseConfig, GetDictionary
 from MFCC import load
 import numpy as np
+from sys import path
+from os import getcwd
+path.append(getcwd())
 from x64.Release.TrainCore import VDecode,BWDecode
 from glob import glob
 from pdb import set_trace
 from os import getcwd
+from sys import argv
 
 
 MAIN_DIR = getcwd() + '/'
-MFCC_FOLDER = MAIN_DIR + 'mfcc/single/'
 MODEL_FOLDER = MAIN_DIR + 'model/'
 DICT_DIR = MAIN_DIR + 'dict/'
-CONFIG_DIR = MAIN_DIR + 'config/'
-
-# Get iteration time limit from config
-# Get configuration
-conf_filename = CONFIG_DIR + sys.argv[2] + '.conf'
-max_iter = int(ParseConfig(conf_filename,'MAXITER'))
 
 
 #########################################################################
 #                          MAIN ENTRY #
 #########################################################################
-if len(sys.argv) < 3:
-    sys.exit("Usage: Decoder.py <dict> <config>")
+if len(argv) != 3:
+    exit("Usage: Tester.py <dict> <mfcc-dir>")
 
-words, model_id = GetDictionary(DICT_DIR + sys.argv[1] + '.txt')
+MFCC_FOLDER = MAIN_DIR + 'mfcc/train/'+argv[2]+'/'
+words, model_id = GetDictionary(DICT_DIR + argv[1] + '.txt')
 
-models = []
-for k in range(len(model_id)):
-    # Load model
-    model_filename = MODEL_FOLDER + model_id[k] + '.xml'
-    name,states,num_states,num_components,dim_observation,log_trans,log_coef,mean,log_var = ReadModel(model_filename)
-    model = [log_trans,log_coef,mean,log_var]
-    models.append(model)
+models = LoadModels(model_id,MODEL_FOLDER)
 
 count = 0
 sum = 0

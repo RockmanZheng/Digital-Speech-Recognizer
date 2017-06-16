@@ -1,11 +1,28 @@
 # Utility model
 import sys
 import subprocess
+import pyaudio
+import wave
+import sys
+from tkinter import *
+import threading
+import time
+ 
+class myThread (threading.Thread):
+	def __init__(self, threadID, name, counter):
+		threading.Thread.__init__(self)
+		self.threadID = threadID
+		self.name = name
+		self.counter = counter
+
+	def run(self):
+		input('Press <Enter> to stop recording.\n')
+ 
 
 # Run command from python
 def RunCmd(cmd):
 	try:
-		retcode = subprocess.call(cmd, shell=True)
+		retcode = subprocess.call(cmd, shell=True,timeout=None)
 		if retcode < 0:
 			print >> sys.stderr, "Child was terminated by signal", -retcode
 	except OSError as e:
@@ -37,3 +54,55 @@ def GetDictionary(filename):
                 words.append(tokens[1])
         dict_file.close()
         return words, ID
+
+def Collect(output_file,instruction=None):
+	CHUNK = 1024
+	FORMAT = pyaudio.paInt16
+	CHANNELS = 1
+	RATE = 44100
+	RECORD_SECONDS = 5
+	
+	if instruction != None:
+		input(instruction)
+	
+	p = pyaudio.PyAudio()
+	stream = p.open(format=FORMAT,
+				channels=CHANNELS,
+				rate=RATE,
+				input=True,
+				frames_per_buffer=CHUNK)
+	print("* recording.")
+	frames = []
+
+	wait_thread = myThread(1, "wait_thread", 1)
+	wait_thread.start()
+
+	while True:
+		data = stream.read(CHUNK)
+		frames.append(data)
+		if not wait_thread.is_alive():
+			break
+	print("* done recording.\n")
+
+	stream.stop_stream()
+	stream.close()
+	p.terminate()
+
+	wf = wave.open(output_file, 'wb')
+	wf.setnchannels(CHANNELS)
+	wf.setsampwidth(p.get_sample_size(FORMAT))
+	wf.setframerate(RATE)
+	wf.writeframes(b''.join(frames))
+	wf.close()
+
+# def my_button(root,label_text,button_text,button_func):    
+#     '''''''function of creat label and button'''    
+#     #label details    
+#     label = Label(root)    
+#     label['text'] = label_text    
+#     label.pack()    
+#     #label details    
+#     button = Button(root)    
+#     button['text'] = button_text    
+#     button['command'] = button_func    
+#     button.pack() 
