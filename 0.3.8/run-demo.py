@@ -23,7 +23,7 @@ train_folder = input('Folder name to place your sound prints.\n')
 # train_path = TRAIN_DIR+train_folder
 
 print('Now start recording.')
-# RunCmd(PYTHON_EXE+' '+SCRIPT_DIR+'SoundPrintCollector.py '+DICT_FILENAME+' '+CONFIG_FILENAME+' '+train_folder)
+RunCmd(PYTHON_EXE+' '+SCRIPT_DIR+'SoundPrintCollector.py '+DICT_FILENAME+' '+CONFIG_FILENAME+' '+train_folder)
 
 print('Now start preprocessing.')
 RunCmd(PYTHON_EXE+' '+SCRIPT_DIR+'SpeechCooker.py '+train_folder)

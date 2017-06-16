@@ -102,7 +102,7 @@ class Signal:
                 energy += signal.get_band_energy(num_bands)
             return energy/num_frames
 
-    def noise_removal(self,noise,sensitivity=5.0):
+    def noise_removal(self,noise,sensitivity=2.0):
         fft_size = 256
         hann_win = get_window('hann',fft_size)
         band_width = 16
@@ -225,5 +225,5 @@ def preprocess(wavfilename):
     noise = Signal(data=noise_data,rate=signal.rate)
     signal.noise_removal(noise)
 
-    signal.truncate_silence(12)
+    signal.truncate_silence(10.0)
     return signal

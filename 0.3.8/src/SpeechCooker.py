@@ -33,7 +33,6 @@ def cook():
             signal.attenuate(gain[i] / gain[i - 1])
             cookedfilename = COOKED_DIR + str(i) + '-' + split(wavfilename)[1]
             signal.write(cookedfilename)
-        print('Done')
-    print('\a')
+    print('Done\a')
 
 cook()

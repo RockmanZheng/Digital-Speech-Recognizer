@@ -40,5 +40,4 @@ mfcc_filename = MFCC_DIR+split(cooked_filename)[1].replace('wav','txt')
 mfcc = load(mfcc_filename)
 
 ans = BWDecode(models,mfcc)
-print('BWDecode: predict = '+str(ans))
 print('BWDecode: predict = '+words[ans])
